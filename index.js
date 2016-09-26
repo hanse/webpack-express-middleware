@@ -1,34 +1,9 @@
 const express = require('express');
 const chalk = require('chalk');
+const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
+const clearConsole = require('react-dev-utils/clearConsole');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
-
-// https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/scripts/start.js
-function clearConsole() {
-  process.stdout.write('\x1bc');
-}
-
-const friendlySyntaxErrorLabel = 'Syntax error:';
-const isLikelyASyntaxError = (message) => message.indexOf(friendlySyntaxErrorLabel) !== -1;
-
-function formatMessage(message) {
-  return message
-    // Make some common errors shorter:
-    .replace(
-      // Babel syntax error
-      'Module build failed: SyntaxError:',
-      friendlySyntaxErrorLabel
-    )
-    .replace(
-      // Webpack file not found error
-      /Module not found: Error: Cannot resolve 'file' or 'directory'/,
-      'Module not found:'
-    )
-    // Internal stacks are generally useless so we strip them
-    .replace(/^\s*at\s.*:\d+:\d+[\s\)]*\n/gm, '') // at ... ...:x:y
-    // Webpack loader names obscure CSS filenames
-    .replace('./~/css-loader!./~/postcss-loader!', '');
-}
 
 function printMessage(message, app) {
   clearConsole();
@@ -49,27 +24,18 @@ function createWebpackMiddleware(compiler, config) {
       });
 
       compiler.plugin('done', (stats) => {
-        const hasErrors = stats.hasErrors();
-        const hasWarnings = stats.hasWarnings();
+        const messages = formatWebpackMessages(stats.toJson({}, true));
+        const hasErrors = messages.errors.length;
+        const hasWarnings = messages.warnings.length;
 
         if (!hasErrors && !hasWarnings) {
           printMessage(chalk.green(`Assets compiled successfully in ${stats.endTime - stats.startTime} ms :-)`), app);
           return;
         }
 
-        const json = stats.toJson();
-
-        const formattedErrors = json.errors.map(
-          (message) => `Error in ${formatMessage(message)}`
-        );
-
-        const formattedWarnings = json.warnings.map(
-          (message) => `Warning in ${formatMessage(message)}`
-        );
-
         if (hasErrors) {
           printMessage(chalk.red('Failed to compile assets :-('), app);
-          formattedErrors.forEach((message) => {
+          messages.errors.forEach((message) => {
             console.log(message);
             console.log();
           });
@@ -78,7 +44,7 @@ function createWebpackMiddleware(compiler, config) {
 
         if (hasWarnings) {
           printMessage(chalk.yellow('Compiled assets with warnings :/'), app);
-          formattedWarnings.forEach((message) => {
+          messages.warnings.forEach((message) => {
             console.log(message);
             console.log();
           });
