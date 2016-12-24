@@ -7,6 +7,11 @@ const clearConsole = require('react-dev-utils/clearConsole');
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 function printMessage(message, app) {
+  if (!isDevelopment) {
+    console.log(message);
+    return;
+  }
+
   clearConsole();
   console.log(`
   The app is running at ${chalk.blue(`http://localhost:${app.get('port')}`)}!
@@ -44,7 +49,7 @@ function createWebpackMiddleware(compiler, config) {
         }
 
         if (hasWarnings) {
-          printMessage(chalk.yellow('Compiled assets with warnings :/'), app);
+          printMessage(chalk.yellow('Compiled assets with warnings in ${stats.endTime - stats.startTime} ms :/'), app);
           messages.warnings.forEach((message) => {
             console.log(message);
             console.log();
