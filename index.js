@@ -49,7 +49,7 @@ function createWebpackMiddleware(compiler, config) {
         }
 
         if (hasWarnings) {
-          printMessage(chalk.yellow('Compiled assets with warnings in ${stats.endTime - stats.startTime} ms :/'), app);
+          printMessage(chalk.yellow(`Compiled assets with warnings in ${stats.endTime - stats.startTime} ms :/`), app);
           messages.warnings.forEach((message) => {
             console.log(message);
             console.log();
