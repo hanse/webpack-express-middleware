@@ -1,6 +1,6 @@
 {
   "name": "webpack-express-middleware",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Sweet express and webpack integration.",
   "main": "index.js",
   "scripts": {
