@@ -66,6 +66,7 @@ function createWebpackMiddleware(compiler, config) {
         log: false
       }));
 
+      app.use(express.static(config.output.path));
       app.use((req, res, next) => {
         const filename = path.join(compiler.outputPath, 'index.html');
         compiler.outputFileSystem.readFile(filename, (err, result) => {
